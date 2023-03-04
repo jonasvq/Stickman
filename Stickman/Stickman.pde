@@ -1,9 +1,7 @@
 import processing.sound.*;
 SoundFile Music;
-PImage unmute;
-PImage mute;
 PImage img;
-PImage bubbleEffect;
+PImage bubbleDesign;
 int numOfTrees = 32;
 float[] treesXPosition = new float[numOfTrees];
 float[] treesYPosition = new float[numOfTrees];
@@ -25,11 +23,9 @@ int scoreNumber = 0;
   frameRate(60);
   size(1600, 800);
   img = loadImage("Pixel_tree.png");
-  unmute = loadImage("Volume_On.png");
-  mute = loadImage("mute.png");
-  bubbleEffect = loadImage("Bubble_effects.png"); 
-  Music = new SoundFile(this, "8-bit_Music.mp3");
-  Music.loop();
+  bubbleDesign = loadImage("pizza.png"); 
+  //Music = new SoundFile(this, "8-bit_Music.mp3");
+  //Music.loop();
   for (int i = 0; i < numOfTrees; i++) {
     treesXPosition[i] = random(0, width-100);
     treesYPosition[i] = random(0, height-125);
@@ -62,7 +58,6 @@ void setNewBubblePos (int index) {
 void setAllBubblePos() {
   for (int i = 0; i < numScoreBubbles; i++) {
     setNewBubblePos(i);
-    //keyShift = 0;
     scoreNumber = 0;
   }
 }
@@ -85,8 +80,8 @@ void draw() {
   for (int i = 0; i < numScoreBubbles; i++) {
     fill(redValue, greenValue, blueValue);
     noStroke();
-    ellipse(bubbleX[i], bubbleY[i], 25, 25);
-    image(bubbleEffect, bubbleX[i]-12, bubbleY[i]-12, 25, 25);
+    ellipse(bubbleX[i], bubbleY[i], 37, 37);
+    image(bubbleDesign, bubbleX[i]-18, bubbleY[i]-18, 37, 37);
     stroke(1);
     noFill();
     if (dist(bubbleX[i], bubbleY[i], x, y) <50) {
@@ -99,8 +94,9 @@ void draw() {
   textSize(35);
   fill(0);
   text(scoreNumber + " Punkte", width-175, 50);
-  textSize(25);
-  text("Press 'r' to reset", width-200, height-50);
+  textSize(30);
+  text("Press 'r' to reset", width-230, height-50);
+  text("Press 'Shift' to sprint",35,height-50);
   noFill();
 println(keyShift);
 }
