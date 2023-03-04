@@ -1,9 +1,12 @@
 import processing.sound.*;
 SoundFile Music;
+PImage unmute;
+PImage mute;
 PImage img;
-int numTrees = 25;
-float[] xTrees = new float[numTrees];
-float[] yTrees = new float[numTrees];
+PImage bubbleEffect;
+int numOfTrees = 32;
+float[] treesXPosition = new float[numOfTrees];
+float[] treesYPosition = new float[numOfTrees];
 float x = 200;
 float y = 200;
 float rightEyeX = 200;
@@ -12,44 +15,54 @@ float leftEyeX = 200;
 float leftEyeY = 200;
 float speed = 5;
 int keyShift;
-int numScoreBubbles = 12;
-float[] xPos = new float[numScoreBubbles];
-float[] yPos = new float[numScoreBubbles];
-int R = (int)random(90, 255), G = (int)random(90, 255), B = (int)random(90, 255);
+int numScoreBubbles = 28;
+float[] bubbleX = new float[numScoreBubbles];
+float[] bubbleY = new float[numScoreBubbles];
+int redValue = (int)random(90, 255), greenValue = (int)random(90, 255), blueValue = (int)random(90, 255);
 int scoreNumber = 0;
 
-void setup() {
+  void setup() {
   frameRate(60);
   size(1600, 800);
   img = loadImage("Pixel_tree.png");
-  //Music = new SoundFile(this, "8-bit_Music.mp3");
-  //Music.loop();
-  for (int i = 0; i < numTrees; i++) {
-    xTrees[i] = random(125, width-125);
-    yTrees[i] = random(125, height-125);
+  unmute = loadImage("Volume_On.png");
+  mute = loadImage("mute.png");
+  bubbleEffect = loadImage("Bubble_effects.png"); 
+  Music = new SoundFile(this, "8-bit_Music.mp3");
+  Music.loop();
+  for (int i = 0; i < numOfTrees; i++) {
+    treesXPosition[i] = random(0, width-100);
+    treesYPosition[i] = random(0, height-125);
   }
   for (int i = 0; i < numScoreBubbles; i++) {
-    xPos[i] = random(750, width-75);
-    yPos[i] = random(75, height-75);
+    bubbleX[i] = random(75, width-75);
+    bubbleY[i] = random(75, height-75);
   }
 }
 
+void volumeSetting(){
+  if(Music.isPlaying() == true){
+       Music.pause();
+  } else if(Music.isPlaying() == false){
+        Music.play();
+  }
+}
 
 void spawnTrees() {
-  for (int i = 0; i < numTrees; i++) {
-    image(img, xTrees[i], yTrees[i], 100.0, 100.0);
+  for (int i = 0; i < numOfTrees; i++) {
+    image(img, treesXPosition[i], treesYPosition[i], 100, 100);
   }
 }
 
 void setNewBubblePos (int index) {
-  xPos[index] = random(75, width-75);
-  yPos[index] = random(75, height-75);
+  bubbleX[index] = random(75, width-75);
+  bubbleY[index] = random(75, height-75);
 }
 
 void setAllBubblePos() {
   for (int i = 0; i < numScoreBubbles; i++) {
     setNewBubblePos(i);
-    keyShift = 0;
+    //keyShift = 0;
     scoreNumber = 0;
   }
 }
@@ -70,20 +83,27 @@ void draw() {
   ellipse(leftEyeX-4.5, leftEyeY-16.1, 4.5, 4.5);
 
   for (int i = 0; i < numScoreBubbles; i++) {
-    fill(R, G, B);
-    ellipse(xPos[i], yPos[i], 25, 25);
+    fill(redValue, greenValue, blueValue);
+    noStroke();
+    ellipse(bubbleX[i], bubbleY[i], 25, 25);
+    image(bubbleEffect, bubbleX[i]-12, bubbleY[i]-12, 25, 25);
+    stroke(1);
     noFill();
-    if (dist(xPos[i], yPos[i], x, y) <50) {
-      xPos[i]-=1700;
-      yPos[i]-=1000;
+    if (dist(bubbleX[i], bubbleY[i], x, y) <50) {
+      bubbleX[i]-=1700;
+      bubbleY[i]-=1000;
       scoreNumber +=1;
       setNewBubblePos(i);
     }
   }
   textSize(35);
-  text(scoreNumber + " Punkte", width-175, 100);
+  fill(0);
+  text(scoreNumber + " Punkte", width-175, 50);
+  textSize(25);
+  text("Press 'r' to reset", width-200, height-50);
+  noFill();
+println(keyShift);
 }
-
 void upwards() {
   strokeWeight(2);
   line(x, y, x, y+40);
@@ -179,11 +199,13 @@ void keyPressed() {
     right();
   } else if (key == 'r') {
     setAllBubblePos();
+  } else if (key == 'm') {
+    volumeSetting();
   }
   if (key == CODED && keyCode == SHIFT) {
     speed = 10;
     keyShift += 1;
-  } else if (keyShift == 2) {
+  } else if (keyShift >= 2) {
     speed = 5;
     keyShift = 0;
   }
