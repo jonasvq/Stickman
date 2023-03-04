@@ -19,11 +19,11 @@ float[] bubbleY = new float[numScoreBubbles];
 int redValue = (int)random(90, 255), greenValue = (int)random(90, 255), blueValue = (int)random(90, 255);
 int scoreNumber = 0;
 
-  void setup() {
+void setup() {
   frameRate(60);
   size(1600, 800);
   img = loadImage("Pixel_tree.png");
-  bubbleDesign = loadImage("pizza.png"); 
+  bubbleDesign = loadImage("pizza.png");
   //Music = new SoundFile(this, "8-bit_Music.mp3");
   //Music.loop();
   for (int i = 0; i < numOfTrees; i++) {
@@ -36,11 +36,11 @@ int scoreNumber = 0;
   }
 }
 
-void volumeSetting(){
-  if(Music.isPlaying() == true){
-       Music.pause();
-  } else if(Music.isPlaying() == false){
-        Music.play();
+void volumeSetting() {
+  if (Music.isPlaying() == true) {
+    Music.pause();
+  } else if (Music.isPlaying() == false) {
+    Music.play();
   }
 }
 
@@ -96,9 +96,9 @@ void draw() {
   text(scoreNumber + " Punkte", width-175, 50);
   textSize(30);
   text("Press 'r' to reset", width-230, height-50);
-  text("Press 'Shift' to sprint",35,height-50);
+  text("Press 'Shift' to sprint", 35, height-50);
   noFill();
-println(keyShift);
+  println(keyShift);
 }
 void upwards() {
   strokeWeight(2);
