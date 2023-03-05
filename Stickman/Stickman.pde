@@ -66,6 +66,7 @@ void winningScreen() {
   textAlign(CENTER);
   text("YOU WON", width/2, height/2);
   textAlign(LEFT);
+  text("Press 'r' to reset", width-230, height-50);
 }
 
 void losingScreen() {
@@ -83,6 +84,7 @@ void losingScreen() {
   textAlign(CENTER);
   text("YOU LOST", width/2, height/2);
   textAlign(LEFT);
+  text("Press 'r' to reset", width-230, height-50);
 }
 
 void drawBubbles() {
