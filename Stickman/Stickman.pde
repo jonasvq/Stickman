@@ -20,8 +20,8 @@ float[] bubbleX = new float[numScoreBubbles];
 float[] bubbleY = new float[numScoreBubbles];
 int redValue = (int)random(90, 255), greenValue = (int)random(90, 255), blueValue = (int)random(90, 255);
 int scoreNumber = 0;
-int winScore = 10;
-int timer = 900;
+int winScore = 60;
+int timer = 2400;
 int time = timer + 59;
 
 void setup() {
