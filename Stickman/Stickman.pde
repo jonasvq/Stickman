@@ -308,7 +308,7 @@ void draw() {
     fill(0);
     text( timer / 60 + " Seconds", 50, 50);
     noFill();
-    timer -= 2;
+    timer -= 1.05;
   }
   if (timer < 0) {
     timer = 0;
