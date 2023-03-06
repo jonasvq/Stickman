@@ -1,9 +1,17 @@
 import processing.sound.*;
 SoundFile gameMusic;
+SoundFile lobbyMusic;
+SoundFile winMusic;
+SoundFile loseMusic;
 PImage img;
 PImage bubbleDesign;
 PImage nyanCat;
 PImage tacnayn;
+PImage sadSponge;
+PImage easyMode;
+PImage hardMode;
+PImage extremeMode;
+PFont welcome;
 int numOfTrees = 32;
 float[] treesXPosition = new float[numOfTrees];
 float[] treesYPosition = new float[numOfTrees];
@@ -20,19 +28,33 @@ float[] bubbleX = new float[numScoreBubbles];
 float[] bubbleY = new float[numScoreBubbles];
 int redValue = (int)random(90, 255), greenValue = (int)random(90, 255), blueValue = (int)random(90, 255);
 int scoreNumber = 0;
-int winScore = 60;
-int timer = 2400;
-int time = timer + 59;
+int winScore;
+int timer;
+int time = timer + 30;
+int difficulty = 0;
+int lobbySong = 0;
+int gameSong = 0;
+int winSong = 0;
+int loseSong = 0;
+int winSongVar = 1;
+int loseSongVar = 1;
 
 void setup() {
   frameRate(60);
   size(1600, 800);
+  welcome = createFont("28DaysLater.ttf", 60);
   img = loadImage("Pixel_tree.png");
   nyanCat = loadImage("nyan-cat.png");
   bubbleDesign = loadImage("pizza.png");
   tacnayn = loadImage("tacnayn.png");
+  sadSponge = loadImage("sadspongebob.png");
+  easyMode = loadImage("easy.png");
+  hardMode = loadImage("hard.png");
+  extremeMode = loadImage("extreme.png");
   gameMusic = new SoundFile(this, "8-bit_Music.mp3");
-  gameMusic.loop();
+  lobbyMusic = new SoundFile(this, "Lobby-Music.mp3");
+  winMusic = new SoundFile(this, "win-song.mp3");
+  loseMusic = new SoundFile(this, "lose-song.mp3");
   for (int i = 0; i < numOfTrees; i++) {
     treesXPosition[i] = random(0, width-100);
     treesYPosition[i] = random(0, height-125);
@@ -40,6 +62,100 @@ void setup() {
   for (int i = 0; i < numScoreBubbles; i++) {
     bubbleX[i] = random(75, width-75);
     bubbleY[i] = random(75, height-75);
+  }
+}
+
+void easy() {
+  stroke(0);
+  strokeWeight(5);
+  fill(0, 255, 0);
+  rectMode(CENTER);
+  rect(400, 400, 250, 250);
+  strokeWeight(0);
+  noStroke();
+  imageMode(CENTER);
+  image(easyMode, 400, 325, 75, 75);
+  fill(0);
+  textSize(30);
+  textAlign(CENTER);
+  text("EASY", 400, 400);
+  textSize(20);
+  text("Reach a score of 20", 400, 425);
+  text("Time: 40 seconds", 400, 450);
+  textAlign(LEFT);
+  noFill();
+  imageMode(CORNER);
+}
+
+void hard() {
+  stroke(0);
+  strokeWeight(5);
+  fill(255, 0, 0);
+  rectMode(CENTER);
+  rect(800, 400, 250, 250);
+  strokeWeight(0);
+  noStroke();
+  imageMode(CENTER);
+  image(hardMode, 800, 325, 75, 75);
+  fill(0);
+  textSize(30);
+  textAlign(CENTER);
+  text("HARD", 800, 400);
+  textSize(20);
+  text("Reach a score of 30", 800, 425);
+  text("Time: 30 seconds", 800, 450);
+  textAlign(LEFT);
+  noFill();
+  imageMode(CORNER);
+}
+
+void extreme() {
+  stroke(0);
+  strokeWeight(5);
+  fill(180, 0, 255);
+  rectMode(CENTER);
+  rect(1200, 400, 250, 250);
+  strokeWeight(0);
+  noStroke();
+  imageMode(CENTER);
+  image(extremeMode, 1200, 325, 75, 75);
+  fill(0);
+  textSize(30);
+  textAlign(CENTER);
+  text("EXTREME", 1200, 400);
+  textSize(20);
+  text("Reach a score of 40", 1200, 425);
+  text("Time: 20 seconds", 1200, 450);
+  textAlign(LEFT);
+  noFill();
+  imageMode(CORNER);
+}
+
+void chooseDifficulty() {
+  background(255);
+  textFont(welcome);
+  textAlign(CENTER);
+  textSize(100);
+  text("STICKMAN", width/2, 175);
+  textAlign(LEFT);
+  easy();
+  hard();
+  extreme();
+  if (dist(400, 400, mouseX, mouseY) < 125 && mousePressed) {
+    difficulty += 1;
+    gameSong += 1;
+    winScore = 20;
+    timer = 2400;
+  } else if (dist(800, 400, mouseX, mouseY) < 125 && mousePressed) {
+    difficulty += 1;
+    gameSong += 1;
+    winScore = 30;
+    timer = 1800;
+  } else if (dist(1200, 400, mouseX, mouseY) < 125 && mousePressed) {
+    difficulty += 1;
+    gameSong += 1;
+    winScore = 40;
+    timer = 1200;
   }
 }
 
@@ -79,6 +195,7 @@ void losingScreen() {
   imageMode(CENTER);
   image(tacnayn, (width/2)-500, height/2, 250, 250);
   image(tacnayn, (width/2)+500, height/2, 250, 250);
+  image(sadSponge, width/2, 662.5, 250, 250);
   fill(0);
   textSize(30);
   textAlign(CENTER);
@@ -128,14 +245,6 @@ void player() {
   ellipse(leftEyeX-4.5, leftEyeY-16.1, 4.5, 4.5);
 }
 
-void volumeSetting() {
-  if (gameMusic.isPlaying() == true) {
-    gameMusic.pause();
-  } else if (gameMusic.isPlaying() == false) {
-    gameMusic.play();
-  }
-}
-
 void spawnTrees() {
   for (int i = 0; i < numOfTrees; i++) {
     image(img, treesXPosition[i], treesYPosition[i], 100, 100);
@@ -155,6 +264,13 @@ void setAllBubblePosAndResetGame() {
     keyShift = 0;
     speed = 5;
     timer = time;
+    difficulty = 0;
+    lobbySong = 0;
+    gameSong = 0;
+    winSong = 0;
+    loseSong = 0;
+    winSongVar = 1;
+    loseSongVar = 1;
     Text();
     x = 200;
     y = 200;
@@ -162,25 +278,57 @@ void setAllBubblePosAndResetGame() {
     rightEyeY = 200;
     leftEyeX = 200;
     leftEyeY = 200;
+
+    if (lobbyMusic.isPlaying() == true) {
+      lobbyMusic.stop();
+    } else if (gameMusic.isPlaying() == true) {
+      gameMusic.stop();
+    } else if (winMusic.isPlaying() == true) {
+      winMusic.stop();
+    } else if (loseMusic.isPlaying() == true) {
+      loseMusic.stop();
+    } else {
+      break;
+    }
   }
 }
 
 void draw() {
-  if (scoreNumber >= winScore) {
+  if (difficulty < 1) {
+    chooseDifficulty();
+  } else if (scoreNumber >= winScore) {
     winningScreen();
     timer = 0;
+    winSong = winSongVar;
   } else if (timer <= 0) {
     losingScreen();
+    loseSong = loseSongVar;
   } else {
     game();
+    fill(0);
+    text( timer / 60 + " Seconds", 50, 50);
+    noFill();
+    timer -= 2;
   }
   if (timer < 0) {
     timer = 0;
   }
-  fill(0);
-  text( timer / 60 + " Seconds", 175, 50);
-  noFill();
-  timer--;
+  if (lobbySong < 1) {
+    lobbyMusic.loop();
+    lobbySong += 1;
+  } else if (gameSong == 1) {
+    lobbyMusic.stop();
+    gameMusic.loop();
+    gameSong += 1;
+  } else if ( winSong == 1) {
+    gameMusic.stop();
+    winMusic.loop();
+    winSongVar += 1;
+  } else if ( loseSong == 1) {
+    gameMusic.stop();
+    loseMusic.play();
+    loseSongVar +=1;
+  }
 }
 void upwards() {
   player();
@@ -253,9 +401,8 @@ void keyPressed() {
     right();
   } else if (key == 'r') {
     setAllBubblePosAndResetGame();
-  } else if (key == 'm') {
-    volumeSetting();
   }
+
   if (key == CODED && keyCode == SHIFT) {
     speed = 10;
     keyShift += 1;
