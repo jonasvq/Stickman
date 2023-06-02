@@ -11,10 +11,10 @@ PImage sadSponge;
 PImage easyMode;
 PImage hardMode;
 PImage extremeMode;
-PFont welcome;
-int numOfTrees = 32;
+PFont gameFont;
 int keyShift;
 int numScoreBubbles = 28;
+int numOfTrees = 32;
 int redValue = (int)random(90, 255), greenValue = (int)random(90, 255), blueValue = (int)random(90, 255);
 int scoreNumber = 0;
 int winScore;
@@ -27,20 +27,23 @@ int winSong = 0;
 int loseSong = 0;
 int winSongVar = 1;
 int loseSongVar = 1;
-float[] treesXPosition = new float[numOfTrees];
-float[] treesYPosition = new float[numOfTrees];
-float x = 200;
-float y = 200;
+int x = 400;
+int y = 400;
 float rightEyeX = 200;
 float rightEyeY = 200;
 float leftEyeX = 200;
 float leftEyeY = 200;
 float speed = 5;
+float[] treesXPosition = new float[numOfTrees];
+float[] treesYPosition = new float[numOfTrees];
+float[] bubbleX = new float[numScoreBubbles];
+float[] bubbleY = new float[numScoreBubbles];
+stickman stickman = new stickman(x, y);
 
 void setup() {
   frameRate(60);
   size(1600, 800);
-  welcome = createFont("28DaysLater.ttf", 60);
+  gameFont = createFont("28DaysLater.ttf", 60);
   img = loadImage("Pixel_tree.png");
   nyanCat = loadImage("nyan-cat.png");
   bubbleDesign = loadImage("pizza.png");
@@ -131,7 +134,7 @@ void extreme() {
 
 void chooseDifficulty() {
   background(255);
-  textFont(welcome);
+  textFont(gameFont);
   textAlign(CENTER);
   textSize(100);
   text("STICKMAN", width/2, 175);
@@ -160,9 +163,9 @@ void chooseDifficulty() {
 void game() {
   background(255);
   spawnTrees();
-  player();
   Text();
   drawBubbles();
+  stickman.display();
 }
 
 void winningScreen() {
@@ -186,7 +189,7 @@ void winningScreen() {
 void losingScreen() {
   background(255);
   noStroke();
-  y += 1000;
+  y += 1500;
   fill(255, 0, 0);
   rectMode(CENTER);
   rect(width/2, height/2, 1000, 250);
@@ -210,7 +213,7 @@ void drawBubbles() {
     image(bubbleDesign, bubbleX[i]-18, bubbleY[i]-18, 37, 37);
     stroke(1);
     noFill();
-    if (dist(bubbleX[i], bubbleY[i], x, y) <50) {
+    if (dist(bubbleX[i], bubbleY[i], stickman.xPos, stickman.yPos) <50) {
       bubbleX[i]-=1700;
       bubbleY[i]-=1000;
       scoreNumber +=1;
@@ -227,20 +230,6 @@ void Text() {
   text("Press 'r' to reset", width-230, height-50);
   text("Press 'Shift' to sprint", 35, height-50);
   noFill();
-}
-
-void player() {
-  strokeWeight(2);
-  line(x, y, x, y+40);
-  line(x, y+40, x+20, y+100);
-  line(x, y+40, x-20, y+100);
-  line(x, y+10, x+20, y+40);
-  line(x, y+10, x-20, y+40);
-  fill(255);
-  ellipse(x, y-12.5, 25, 25);
-  noFill();
-  ellipse(rightEyeX+4.5, rightEyeY-16.1, 4.5, 4.5);
-  ellipse(leftEyeX-4.5, leftEyeY-16.1, 4.5, 4.5);
 }
 
 void spawnTrees() {
@@ -270,12 +259,14 @@ void setAllBubblePosAndResetGame() {
     winSongVar = 1;
     loseSongVar = 1;
     Text();
-    x = 200;
-    y = 200;
-    rightEyeX = 200;
-    rightEyeY = 200;
-    leftEyeX = 200;
-    leftEyeY = 200;
+    x = 400;
+    y = 400;
+    stickman.yPos = y;
+    stickman.xPos = x;
+    stickman.lEyeX = x;
+    stickman.lEyeY = y;
+    stickman.rEyeX = x;
+    stickman.rEyeY = y;
 
     if (lobbyMusic.isPlaying() == true) {
       lobbyMusic.stop();
@@ -306,7 +297,7 @@ void draw() {
     fill(0);
     text( timer / 60 + " Seconds", 50, 50);
     noFill();
-    timer -= 1.05;
+    timer --;
   }
   if (timer < 0) {
     timer = 0;
@@ -328,84 +319,35 @@ void draw() {
     loseSongVar +=1;
   }
 }
-void upwards() {
-  player();
-  rightEyeX = 2000;
-  rightEyeY = 1000;
-  leftEyeX = 2000;
-  leftEyeY = 1000;
-  y -= speed;
-}
-
-void downwards() {
-  player();
-  if (keyShift == 0) {
-    rightEyeX = x;
-    rightEyeY = y+5;
-    leftEyeX = x;
-    leftEyeY = y+5;
-  } else {
-    rightEyeX = x;
-    rightEyeY = y+10;
-    leftEyeX = x;
-    leftEyeY = y+10;
-  }
-
-  ellipse(rightEyeX+4.5, rightEyeY-16.1, 4.5, 4.5);
-  ellipse(leftEyeX-4.5, leftEyeY-16.1, 4.5, 4.5);
-  y += speed;
-}
-
-void right() {
-  player();
-  if (keyShift == 0) {
-    rightEyeX = x+5;
-    rightEyeY = y;
-  } else {
-    rightEyeX = x+10;
-    rightEyeY = y;
-  }
-  leftEyeX = x;
-  leftEyeY = y-1000;
-  ellipse(rightEyeX+4.5, rightEyeY-16.1, 4.5, 4.5);
-  ellipse(leftEyeX+4.5, leftEyeY-16.1, 4.5, 4.5);
-  x += speed;
-}
-
-void left() {
-  player();
-  if (keyShift == 0) {
-    leftEyeX = x-5;
-    leftEyeY = y;
-  } else {
-    leftEyeX = x-10;
-    leftEyeY = y;
-  }
-  rightEyeX = x+5;
-  rightEyeY = y-1000;
-  ellipse(rightEyeX+4.5, rightEyeY-16.1, 4.5, 4.5);
-  ellipse(leftEyeX+4.5, leftEyeY-16.1, 4.5, 4.5);
-  x -= speed;
-}
 
 void keyPressed() {
   if (key == 'w' && y > 30) {
-    upwards();
+    //upwards();
+    stickman.goUp();
+    y -= speed;
   } else if (key == 'a' && x > 35) {
-    left();
+    //left();
+    stickman.goLeft();
+    x -= speed;
   } else if (key == 's' && y < height -125) {
-    downwards();
+    //downwards();
+    stickman.goDown();
+    y += speed;
   } else if (key == 'd' && x < width -35) {
-    right();
+    //right();
+    stickman.goRight();
+    x += speed;
   } else if (key == 'r') {
     setAllBubblePosAndResetGame();
   }
 
   if (key == CODED && keyCode == SHIFT) {
     speed = 10;
+    stickman.sprint();
     keyShift += 1;
   } else if (keyShift >= 2) {
     speed = 5;
+    stickman.walk();
     keyShift = 0;
   }
 }
